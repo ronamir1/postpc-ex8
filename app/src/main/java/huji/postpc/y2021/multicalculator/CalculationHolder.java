@@ -54,12 +54,15 @@ public class CalculationHolder extends Activity {
         }
     }
 
-    public void addCalc(double root){
+    public int addCalc(double root){
         Calculation calc = new Calculation(root);
-        calculations.addFirst(calc);
+        calculations.add(calc);
+        Collections.sort(this.calculations);
         if (sp != null){
             saveItems();
         }
+
+        return calculations.indexOf(calc);
     }
 
     public void completedCalc(Calculation calc){

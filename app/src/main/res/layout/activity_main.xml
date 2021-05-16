@@ -10,6 +10,7 @@
         android:id="@+id/calcRecyclerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/editTextInsertCalc"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
     </androidx.recyclerview.widget.RecyclerView>

@@ -30,7 +30,8 @@
         />
 
     <ProgressBar
-        style="@android:style/Widget.ProgressBar.Horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progress="0"
         android:id="@+id/calculationRowProgress"
         android:layout_width="350dp"
         android:layout_height="15dp"

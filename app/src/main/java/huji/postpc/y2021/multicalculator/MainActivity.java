@@ -76,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
     private void startWork(double root, int pos){
         Calculation calc = null;
         if (pos == -1){
-            calcHolder.addCalc(root);
-            calc = calcHolder.calculations.get(0);
-            adapter.notifyItemInserted(0);
+            pos = calcHolder.addCalc(root);
+            calc = calcHolder.calculations.get(pos);
+            adapter.notifyItemInserted(pos);
         }
         else {
             calc = calcHolder.calculations.get(pos);
@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(context).enqueue(workRequest);
         calc.workId = workRequest.getId().toString();
         LiveData<WorkInfo> workInfo = WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(workRequest.getId());
-
         workInfo.observeForever(new Observer<WorkInfo>() {
             @Override
             public void onChanged(@Nullable WorkInfo workInfo) {
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateProgress(String workId, int progress){
         for (int i = 0 ; i < calcHolder.calculations.size(); i++){
-            if (calcHolder.calculations.get(i).workId.equals(workId)){
+            if (calcHolder.calculations.get(i).workId != null && calcHolder.calculations.get(i).workId.equals(workId)){
                 calcHolder.calculations.get(i).progress = progress;
                 CalculationHolder.CalculationAdapter.ViewHolder viewHolder = (CalculationHolder.CalculationAdapter.ViewHolder) calcRecyclerView.findViewHolderForLayoutPosition(i);
                 if (viewHolder != null){

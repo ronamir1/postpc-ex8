@@ -58,13 +58,13 @@ public class Calculation implements Serializable, Comparable<Calculation> {
     @Override
     public int compareTo(Calculation calculation) {
         if (this.inProgress && !calculation.inProgress){
-            return 1;
-        }
-        else if(!this.inProgress && calculation.inProgress){
             return -1;
         }
+        if(!this.inProgress && calculation.inProgress){
+            return 1;
+        }
 
-        else if (this.id < calculation.id){
+        if (this.root > calculation.root){
             return 1;
         }
 
