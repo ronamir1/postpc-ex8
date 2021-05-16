@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">multiCalculator</string>
+    <string name="preference_file_key">huji.postpc.y2021.multi_calculator.preference_file_key</string>
+    <string name="calculations">calculation</string>
+</resources>
