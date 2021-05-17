@@ -3,6 +3,8 @@ package huji.postpc.y2021.multicalculator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +15,9 @@ import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.WorkManager;
 
@@ -65,12 +69,14 @@ public class CalculationHolder extends Activity {
         return calculations.indexOf(calc);
     }
 
-    public void completedCalc(Calculation calc){
+    public int completedCalc(Calculation calc){
         calc.inProgress = false;
         Collections.sort(this.calculations);
+        int pos =this.calculations.indexOf(calc);
         if (sp != null){
             saveItems();
         }
+        return pos;
     }
 
     public void deleteCalc(Calculation calc)
@@ -92,15 +98,18 @@ public class CalculationHolder extends Activity {
     public static class CalculationAdapter extends RecyclerView.Adapter<CalculationAdapter.ViewHolder>{
         private final CalculationHolder calcHolder;
         private final WorkManager workManager;
+        Context context;
 
         public CalculationAdapter(CalculationHolder calcHolder, WorkManager workManager) {
             this.calcHolder = calcHolder;
             this.workManager = workManager;
+
         }
 
         @NonNull
         @Override
         public CalculationAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            this.context = parent.getContext();
             View view = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.row_calculation, parent, false);
             return new ViewHolder(view);
@@ -116,7 +125,9 @@ public class CalculationHolder extends Activity {
                 public void onClick(View view) {
                     int pos = holder.getLayoutPosition();
                     Calculation calc = calcHolder.calculations.get(pos);
-                    workManager.cancelWorkById(UUID.fromString(calc.workId));
+                    if (calc.inProgress){
+                        workManager.cancelWorkById(UUID.fromString(calc.workId));
+                    }
                     calcHolder.deleteCalc(calc);
                     notifyItemRangeRemoved(pos, 1);
                 }
@@ -126,7 +137,7 @@ public class CalculationHolder extends Activity {
             }
             else {
                 holder.calculationRowProgress.setVisibility(View.INVISIBLE);
-                holder.calculationRowDelete.setVisibility(View.INVISIBLE);
+                holder.calculationRowDelete.setBackground(AppCompatResources.getDrawable(context, R.drawable.ic_baseline_delete_24));
             }
         }
 
@@ -141,9 +152,11 @@ public class CalculationHolder extends Activity {
             private final ConstraintLayout calculationRow;
             private final ProgressBar calculationRowProgress;
             private final Context context;
+            private final View view;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
+                this.view = itemView;
                 this.calculationRowRoot = itemView.findViewById(R.id.calculationRowRoot);
                 this.calculationRowDelete = itemView.findViewById(R.id.calculationRowDelete);
                 this.calculationRow = itemView.findViewById(R.id.calculationRow);
@@ -156,11 +169,11 @@ public class CalculationHolder extends Activity {
             }
 
             public void turnOffProgressBar(){
-                calculationRowProgress.setVisibility(View.INVISIBLE);
+                calculationRowProgress.setVisibility(View.GONE);
             }
 
             public void turnOffDeleteButton(){
-                calculationRowDelete.setVisibility(View.INVISIBLE);
+                calculationRowDelete.setBackground(AppCompatResources.getDrawable(context, R.drawable.ic_baseline_delete_24));
             }
 
             public void setMessage(String message){

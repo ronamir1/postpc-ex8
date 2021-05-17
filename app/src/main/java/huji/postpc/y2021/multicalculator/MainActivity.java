@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import static android.widget.LinearLayout.HORIZONTAL;
+import static android.widget.LinearLayout.VERTICAL;
 import static java.util.jar.Pack200.Unpacker.PROGRESS;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         adapter = new CalculationHolder.CalculationAdapter(calcHolder, WorkManager.getInstance(context));
         calcRecyclerView.setAdapter(adapter);
         calcRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        DividerItemDecoration itemDecor = new DividerItemDecoration(context, VERTICAL);
+        calcRecyclerView.addItemDecoration(itemDecor);
         dataBuilder  = new Data.Builder();
 
         buttonCreateCalc.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         dataBuilder.putDouble("current", calc.curCandidate);
         OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CalculationWorker.class).setInputData(dataBuilder.build()).build();
         WorkManager.getInstance(context).enqueue(workRequest);
-        calc.workId = workRequest.getId().toString();
+        calc.setWorkId(workRequest.getId().toString());
         LiveData<WorkInfo> workInfo = WorkManager.getInstance(getApplicationContext()).getWorkInfoByIdLiveData(workRequest.getId());
         workInfo.observeForever(new Observer<WorkInfo>() {
             @Override
@@ -120,9 +125,9 @@ public class MainActivity extends AppCompatActivity {
         Calculation calc = calcHolder.calculations.get(pos);
         calc.div1 = first;
         calc.div2 = second;
-        calcHolder.completedCalc(calc);
+        int new_pos = calcHolder.completedCalc(calc);
         adapter.notifyDataSetChanged();
-        CalculationHolder.CalculationAdapter.ViewHolder viewHolder = (CalculationHolder.CalculationAdapter.ViewHolder) calcRecyclerView.findViewHolderForLayoutPosition(pos);
+        CalculationHolder.CalculationAdapter.ViewHolder viewHolder = (CalculationHolder.CalculationAdapter.ViewHolder) calcRecyclerView.findViewHolderForLayoutPosition(new_pos);
         if (viewHolder != null){
             viewHolder.turnOffProgressBar();
             viewHolder.turnOffDeleteButton();
@@ -144,9 +149,9 @@ public class MainActivity extends AppCompatActivity {
             int pos = findCalc(id);
             Calculation calc = calcHolder.calculations.get(pos);
             calc.isPrime = true;
-            calcHolder.completedCalc(calc);
+            int new_pos = calcHolder.completedCalc(calc);
             adapter.notifyDataSetChanged();
-            CalculationHolder.CalculationAdapter.ViewHolder viewHolder = (CalculationHolder.CalculationAdapter.ViewHolder) calcRecyclerView.findViewHolderForLayoutPosition(pos);
+            CalculationHolder.CalculationAdapter.ViewHolder viewHolder = (CalculationHolder.CalculationAdapter.ViewHolder) calcRecyclerView.findViewHolderForLayoutPosition(new_pos);
             if (viewHolder != null){
                 viewHolder.turnOffProgressBar();
                 viewHolder.turnOffDeleteButton();
